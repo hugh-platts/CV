@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hugh Platts - Aerospace Engineering CV</title>
+    
+    <!-- Tailwind and Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <!-- Main Styles for Animation and CV -->
+    <style>
+        /* Base styles from the animation */
+        :root {
+            --padding: 10vmin;
+            --color-background: #D0CBC7;
+            --font-size-large: 8vw;
+            --font-size-medium: 4vw;
+            --font-size-normal: 2vw;
+        }
+        @media only screen and (min-width: 800px) {
+            :root {
+                --font-size-large: 64px;
+                --font-size-medium: 32px;
+                --font-size-normal: 16px;
+            }
+        }
+        @media only screen and (max-width: 500px) {
+            :root {
+                --font-size-large: 40px;
+                --font-size-medium: 20px;
+                --font-size-normal: 14px;
+            }
+        }
+        
+        /* SCSS @property converted to CSS */
+        @property --angle {
+          syntax: '<angle>';
+          initial-value: 0deg;
+          inherits: false;
+        }
+
+        /* Body and HTML for animation part */
+        .animation-body {
+            margin: 0;
+            min-height: 100%;
+            width: 100%;
+            font-family: 'Libre Baskerville', serif;
+            background-color: var(--color-background);
+            font-weight: 400;
+            font-size: var(--font-size-normal);
+            overflow-x: hidden;
+        }
+
+        .animation-body a { color: white; }
+        .animation-body ul { margin: 0; padding: 0; list-style: none; }
+        .animation-body li { margin-top: 10px; }
+
+        canvas {
+            position: fixed;
+            z-index: 10;
+            top: 0;
+            left: 0;
+            z-index: 2;
+            pointer-events: none;
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+        .content .trigger {
+            position: absolute;
+            top: 0;
+            height: 100%;
+        }
+        .content .section {
+            position: relative;
+            padding: var(--padding);
+            --pad2: calc(var(--padding) * 2);
+            width: calc(100vw - var(--pad2));
+            height: calc(100vh - var(--pad2));
+            margin: 0 auto;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .content .section.dark {
+            color: white;
+            background-color: black;
+        }
+        .content .section.right {
+            text-align: right;
+            align-items: flex-end;
+        }
+        .content .blueprint {
+            position: relative;
+            background-color:#131C2A;
+            background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+            background-size:100px 100px, 100px 100px, 20px 20px, 20px 20px;
+            background-position:-2px -2px, -2px -2px, -1px -1px, -1px -1px;
+            background-attachment: fixed;
+        }
+        .content .blueprint .dark {
+            background-color: transparent;
+        }
+        .content .ground-container {
+            position: relative;
+            overflow: hidden;
+        }
+        .content .ground-container .parallax {
+            position:absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: -100px;
+            background-repeat: no-repeat;
+            background-position: top center;
+            background-size: cover;
+            transform-origin: top center;
+        }
+        .content .ground-container .ground {
+            z-index: -1;
+            background-image: url("https://assets.codepen.io/557388/background-reduced.jpg");     
+        }
+        .content .ground-container .clouds {
+            z-index: 2;
+            background-image: url("https://assets.codepen.io/557388/clouds.png");
+        }
+        .content .scroll-cta, .content .credits {
+            position: absolute;
+            bottom: var(--padding);
+        }    
+        .content .scroll-cta {
+            font-size: var(--font-size-medium);
+            opacity: 0;
+        }
+        .content h1, .content h2 {
+            font-size: var(--font-size-large);
+            margin: 0vmin 0 2vmin 0 ;
+            font-weight: 700;
+            display: inline;
+        }
+        .content h3 {
+            font-size: var(--font-size-medium);
+            font-weight: 400;
+            margin: 0;
+        }
+        .intro-details {
+            margin-top: 1.5rem;
+            font-size: var(--font-size-normal);
+            font-weight: 400;
+            color: #3f3f46; /* zinc-700 for better readability */
+        }
+        .intro-details p {
+            margin: 0.25rem 0;
+        }
+        .loading {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-medium);
+            background-color: var(--color-background);
+            z-index: 9999;
+        }
+
+        /* CV Section Styles */
+        .cv-container {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            padding: 4rem 1rem;
+            opacity: 0; /* Initially hidden */
+            visibility: hidden;
+            transition: opacity 1s ease-in-out;
+            position: relative;
+            z-index: 20;
+        }
+        .cv-container.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .section-title {
+            border-bottom: 2px solid #D1D5DB;
+        }
+        
+        /* Card animation from previous version */
+        .animated-card {
+            --angle: 0deg;
+            position: relative;
+            border: 3px solid transparent;
+            background-clip: padding-box;
+            -webkit-background-clip: padding-box;
+            border-radius: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        .animated-card:hover {
+             border-color: #60a5fa;
+        }
+        .animated-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: -3px;
+            border-radius: inherit;
+            background: conic-gradient(
+                from var(--angle),
+                #a78bfa, #3b82f6, #60a5fa, #3b82f6, #a78bfa
+            );
+            z-index: -1;
+            animation: 5s rotate linear infinite;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+        }
+        .animated-card:hover::before {
+            opacity: 1;
+        }
+        .animated-card-content {
+            background-color: white;
+            border-radius: 0.875rem;
+            overflow: hidden;
+            height: 100%;
+        }
+        @keyframes rotate {
+            to { --angle: 360deg; }
+        }
+
+        /* Skip Button Style */
+        .skip-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 100;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            transition: background-color 0.3s, opacity 0.3s;
+        }
+        .skip-button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+    </style>
+</head>
+<body class="animation-body">
+
+    <button id="skip-btn" class="skip-button">Skip to CV</button>
+
+    <!-- 3D Animation Content -->
+    <div class="content">
+        <div class="loading">Loading...</div>
+        <div class="trigger"></div>
+        <div class="section">
+            <h1>Hugh Platts.</h1>
+            <h3>Aerospace Engineering Graduate.</h3>
+            <div class="intro-details">
+                <p><b>Degree:</b> BEng (Hons) Aerospace Engineering</p>
+                <p><b>Key Skills:</b> SolidWorks, ANSYS CFD, Python, C++</p>
+            </div>
+            <div class="scroll-cta">Scroll</div>
+        </div>
+        
+        <div class="section right">
+            <h2>Industry Experience</h2>
+            <p>BAE Systems, Movement to Work Scheme</p>
+        </div>
+        
+        <div class="ground-container">
+            <div class="parallax ground"></div>
+            <div class="section right">
+                <h2>Hands-on Maintenance</h2>
+                <p>Eshott Airfield, Aviation Maintenance Placement</p>
+            </div>
+
+            <div class="section">
+                <h2>Technical Proficiency</h2>
+                <p>Macclesfield College, Jetstream 31 Maintenance</p>
+            </div>
+            
+            <div class="section right">
+                <h2>Core Education</h2>
+                <p>Teesside University & Macclesfield College</p>
+            </div>
+            <div class="parallax clouds"></div>
+        </div>
+        
+        <div class="blueprint">
+            <div class="section dark">
+                <h2>Design & Analysis</h2>
+                <p>SolidWorks, Siemens NX, ANSYS CFD</p>
+            </div>
+            <div class="section dark">
+                <h2>Automation & Computing</h2>
+                <p>Python, C++, MATLAB</p>
+            </div>
+            <div class="section dark">
+                <h2>Network Engineering</h2>
+                <p>6 Years of hands-on experience</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CV Content Section -->
+    <div id="cv-section" class="cv-container">
+         <div class="container mx-auto">
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                <header class="bg-gray-800 text-white p-8 md:p-12">
+                    <div class="flex flex-col md:flex-row items-center justify-between">
+                        <div>
+                            <h1 class="text-4xl md:text-5xl font-bold tracking-tight">Hugh Platts</h1>
+                            <p class="text-xl md:text-2xl text-gray-300 mt-2">Aerospace Engineering Graduate</p>
+                        </div>
+                        <div class="mt-6 md:mt-0 text-right text-sm">
+                            <div class="flex items-center justify-end space-x-4">
+                                <i class="fas fa-envelope"></i>
+                                <a href="mailto:Hughplatts21@gmail.com" class="hover:text-blue-400 transition-colors">Hughplatts21@gmail.com</a>
+                            </div>
+                            <div class="flex items-center justify-end space-x-4 mt-2">
+                                <i class="fas fa-phone"></i>
+                                <span>07788251208</span>
+                            </div>
+                            <div class="flex items-center justify-end space-x-4 mt-2">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Manchester (Willing to relocate)</span>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <main class="p-8 md:p-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
+                    <div class="lg:col-span-2">
+                        <section id="about">
+                            <h2 class="text-2xl font-bold pb-2 mb-4 section-title">About Me</h2>
+                            <p class="text-gray-700 leading-relaxed">
+                                I work well as part of a team, am able to follow directions from all levels, and establish good working relationships with all of my coworkers. I am adaptable and have impeccable time management abilities. I am a person who works hard and is enthusiastic, self-motivated, trustworthy, and responsible. Above all, I am always curious about new technologies and adaptable to changing environments.
+                            </p>
+                        </section>
+
+                        <section id="employment" class="mt-10">
+                            <h2 class="text-2xl font-bold pb-2 mb-4 section-title">Employment</h2>
+                            <div class="space-y-6">
+                                <div class="p-6 bg-gray-50 rounded-xl border border-gray-200">
+                                    <h3 class="font-bold text-lg">Sales Associate (Including Web Development)</h3>
+                                    <p class="text-md text-gray-600">Riddit Homes | Full-Time, June 2024-Present & Part-time, Sep 2023 - June 2024</p>
+                                </div>
+                                <div class="p-6 bg-gray-50 rounded-xl border border-gray-200">
+                                    <h3 class="font-bold text-lg">Receptionist</h3>
+                                    <p class="text-md text-gray-600">Travelodge | Part-Time, Sep 2023 - Sep 2024 (1 Year)</p>
+                                </div>
+                                 <div class="p-6 bg-gray-50 rounded-xl border border-gray-200">
+                                    <h3 class="font-bold text-lg">Bar Staff</h3>
+                                    <p class="text-md text-gray-600">Piccolino, Knutsford | July 2021 - Nov 2021 (4 months)</p>
+                                </div>
+                                 <div class="p-6 bg-gray-50 rounded-xl border border-gray-200">
+                                    <h3 class="font-bold text-lg">Furniture Sales & Courier</h3>
+                                    <p class="text-md text-gray-600">Riddit Homes, Knutsford | Nov 2019 - Sep 2020 (12 months)</p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section id="experience" class="mt-10">
+                            <h2 class="text-2xl font-bold pb-2 mb-4 section-title">Aviation/Industry Experience</h2>
+                            <div class="space-y-8">
+                                <div id="bae-experience" class="animated-card">
+                                    <div class="animated-card-content shadow-md">
+                                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9bjzLzChjLbNi60nZCnK5sVpB5azzLyGJbg&s" alt="BAE Systems Aircraft" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/1200x630/e2e8f0/4a5568?text=BAE+Systems';">
+                                        <div class="p-6">
+                                            <h3 class="font-bold text-lg">Bae Systems Samlesbury</h3>
+                                            <p class="mt-2 text-gray-700">Gained valuable insight into various roles, observed Eurofighter Typhoon production, viewed the Tempest fighter jet model, and participated in an electronics workshop and VR Cave demo.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="eshott-experience" class="animated-card">
+                                    <div class="animated-card-content shadow-md">
+                                        <img src="https://live.staticflickr.com/7476/15286453753_03e2fdd6c7_b.jpg" alt="Eshott Airfield" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/1024x628/e2e8f0/4a5568?text=Eshott+Airfield';">
+                                        <div class="p-6">
+                                            <h3 class="font-bold text-lg">Eshott Airfield, Aviation Maintenance</h3>
+                                            <p class="mt-2 text-gray-700">Gained hands-on experience by assisting with airworthiness reviews, supporting maintenance tasks, and contributing to aircraft restoration.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="macclesfield-experience" class="animated-card">
+                                     <div class="animated-card-content shadow-md">
+                                        <img src="https://i2-prod.macclesfield-live.co.uk/incoming/article12711483.ece/ALTERNATES/s1200/JS113746113.jpg" alt="Macclesfield College Jetstream 31" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/1200x630/e2e8f0/4a5568?text=Macclesfield+College';">
+                                        <div class="p-6">
+                                            <h3 class="font-bold text-lg">Macclesfield College, Jetstream 31 Maintenance</h3>
+                                            <p class="mt-2 text-gray-700">Regularly participated in Jetstream 31 maintenance sessions, using the Aircraft Maintenance Manual (AMM) to perform various maintenance procedures.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <div class="lg:col-span-1">
+                        <section id="education">
+                            <h2 class="text-2xl font-bold pb-2 mb-4 section-title">Education</h2>
+                            <div class="space-y-4">
+                                <div><h3 class="font-bold text-lg">Teesside University</h3><p>Aerospace engineering BEng (Hons) - 2:2</p></div>
+                                <div><h3 class="font-bold text-lg">Macclesfield College</h3><p>Extended Diploma in Aeronautical Engineering - DMM</p></div>
+                                <div><h3 class="font-bold text-lg">King's School Macclesfield</h3><p>GCSEs</p></div>
+                            </div>
+                        </section>
+
+                        <section id="skills" class="mt-10">
+                            <h2 class="text-2xl font-bold pb-2 mb-4 section-title">Skills</h2>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">Python (3 Yrs)</span>
+                                <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">C++ (1 Yr)</span>
+                                <span class="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">ANSYS CFD (3 Yrs)</span>
+                                <span class="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">Siemens NX (3 Yrs)</span>
+                                <span class="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">SolidWorks (6 Yrs)</span>
+                                <span class="bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-1 rounded-full">MATLAB (1 Yr)</span>
+                                <span class="bg-purple-100 text-purple-800 text-sm font-medium px-3 py-1 rounded-full">Network Engineering (6 Yrs)</span>
+                            </div>
+                        </section>
+
+                        <section id="achievements" class="mt-10">
+                            <h2 class="text-2xl font-bold pb-2 mb-4 section-title">Other Achievements</h2>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>Air Cadet (2056 squadron)</li>
+                                <li>Bronze Duke of Edinburgh</li>
+                                <li>Basketball Team Captain</li>
+                            </ul>
+                        </section>
+                    </div>
+                </main>
+                <footer class="text-center p-4 bg-gray-800 text-gray-400 text-sm">
+                    <p>&copy; 2025 Hugh Platts.</p>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- Animation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollToPlugin.min.js"></script>
+    
+    <script>
+        console.clear();
+
+        // Skip Button Logic
+        document.getElementById('skip-btn').addEventListener('click', () => {
+            gsap.to(window, {
+                duration: 1.5,
+                scrollTo: '#cv-section',
+                ease: 'power2.inOut'
+            });
+        });
+
+
+        class Scene {
+            constructor(model) {
+                this.views = [
+                    { bottom: 0, height: 1 },
+                    { bottom: 0, height: 0 }
+                ];
+                
+                this.renderer = new THREE.WebGLRenderer({
+                    antialias: true,
+                    alpha: true
+                });
+                
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                this.renderer.setPixelRatio(window.devicePixelRatio);
+
+                document.body.appendChild( this.renderer.domElement );
+                
+                this.scene = new THREE.Scene();
+                
+                for ( let ii = 0; ii < this.views.length; ++ ii ) {
+                    const view = this.views[ ii ];
+                    const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+                    camera.position.fromArray([0, 0, 180] );
+                    camera.layers.disableAll();
+                    camera.layers.enable( ii );
+                    view.camera = camera;
+                    camera.lookAt(new THREE.Vector3(0, 5, 0));
+                }
+                
+                this.light = new THREE.PointLight( 0xffffff, 0.75 );
+                this.light.position.z = 150;
+                this.light.position.x = 70;
+                this.light.position.y = -20;
+                this.scene.add( this.light );
+
+                this.softLight = new THREE.AmbientLight( 0xffffff, 1.5 );
+                this.scene.add(this.softLight)
+
+                this.onResize();
+                window.addEventListener( 'resize', this.onResize, false );
+                
+                const edges = new THREE.EdgesGeometry( model.children[ 0 ].geometry );
+                let line = new THREE.LineSegments( edges );
+                line.material.depthTest = false;
+                line.material.opacity = 0.5;
+                line.material.transparent = true;
+                line.position.x = 0.5;
+                line.position.z = -1;
+                line.position.y = 0.2;    
+                
+                this.modelGroup = new THREE.Group();
+                
+                model.layers.set( 0 );
+                line.layers.set( 1 );
+                    
+                this.modelGroup.add(model);
+                this.modelGroup.add(line);
+                this.scene.add(this.modelGroup);
+            }
+            
+            render = () => {
+                for ( let ii = 0; ii < this.views.length; ++ ii ) {
+                    const view = this.views[ ii ];
+                    const camera = view.camera;
+                    const bottom = Math.floor( this.h * view.bottom );
+                    const height = Math.floor( this.h * view.height );
+
+                    this.renderer.setViewport( 0, 0, this.w, this.h );
+                    this.renderer.setScissor( 0, bottom, this.w, height );
+                    this.renderer.setScissorTest( true );
+
+                    camera.aspect = this.w / this.h;
+                    this.renderer.render( this.scene, camera );
+                }
+            }
+            
+            onResize = () => {
+                this.w = window.innerWidth;
+                this.h = window.innerHeight;
+                
+                for ( let ii = 0; ii < this.views.length; ++ ii ) {
+                    const view = this.views[ ii ];
+                    const camera = view.camera;
+                    camera.aspect = this.w / this.h;
+                    
+                    // Adjust camera Z position based on screen width
+                    if (this.w < 768) { // Mobile devices
+                        camera.position.z = 250; // Further away for a smaller plane
+                    } else { // Desktop devices
+                        let camZ = (screen.width - (this.w * 1)) / 3;
+                        camera.position.z = camZ < 180 ? 180 : camZ;
+                    }
+                    
+                    camera.updateProjectionMatrix();
+                }
+
+                this.renderer.setSize( this.w, this.h );        
+                this.render();
+            }
+        }
+
+        function loadModel() {
+            gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+            
+            var object;
+
+            function onModelLoaded() {
+                object.traverse( function ( child ) {
+                    if (child instanceof THREE.Mesh) {
+                      let mat = new THREE.MeshPhongMaterial( { color: 0x171511, specular: 0xD0CBC7, shininess: 5, flatShading: true } );
+                      child.material = mat;
+                    }
+                });
+                setupAnimation(object);
+            }
+
+            var manager = new THREE.LoadingManager( onModelLoaded );
+            manager.onProgress = ( item, loaded, total ) => console.log( `Loading model: ${item} (${loaded}/${total})` );
+
+            var loader = new THREE.OBJLoader( manager );
+            loader.load( 'https://assets.codepen.io/557388/1405+Plane_1.obj', (obj) => { object = obj; });
+        }
+
+        function setupAnimation(model) {
+            let scene = new Scene(model);
+            let plane = scene.modelGroup;
+            
+            gsap.fromTo('canvas',{x: "50%", autoAlpha: 0}, {duration: 1, x: "0%", autoAlpha: 1});
+            gsap.to('.loading', {autoAlpha: 0});
+            gsap.to('.scroll-cta', {opacity: 1});
+            
+            let tau = Math.PI * 2;
+
+            gsap.set(plane.rotation, {y: tau * -0.25});
+            gsap.set(plane.position, {x: 80, y: -32, z: -60});
+            
+            scene.render();
+            
+            var sectionDuration = 1;
+            gsap.fromTo(scene.views[1], 
+                { height: 1, bottom: 0 }, 
+                {
+                    height: 0, bottom: 1,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: ".blueprint",
+                        scrub: true,
+                        start: "bottom bottom",
+                        end: "bottom top"
+                    }
+                })
+            
+            gsap.fromTo(scene.views[1], 
+                { height: 0, bottom: 0 }, 
+                {
+                    height: 1, bottom: 0,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: ".blueprint",
+                        scrub: true,
+                        start: "top bottom",
+                        end: "top top"
+                    }
+                })
+            
+            gsap.to('.ground', {
+                y: "30%",
+                scrollTrigger: {
+                    trigger: ".ground-container",
+                    scrub: true,
+                    start: "top bottom",
+                    end: "bottom top"
+                }
+            })
+            
+            gsap.from('.clouds', {
+                y: "25%",
+                scrollTrigger: {
+                    trigger: ".ground-container",
+                    scrub: true,
+                    start: "top bottom",
+                    end: "bottom top"
+                }
+            })
+            
+            let tl = new gsap.timeline({
+                onUpdate: scene.render,
+                scrollTrigger: {
+                    trigger: ".content",
+                    scrub: true,
+                    start: "top top",
+                    end: "bottom bottom"
+                },
+                defaults: {duration: sectionDuration, ease: 'power2.inOut'}
+            });
+            
+            let delay = 0;
+            
+            tl.to('.scroll-cta', {duration: 0.25, opacity: 0}, delay)
+            tl.to(plane.position, {x: -10, ease: 'power1.in'}, delay)
+            
+            delay += sectionDuration;
+            tl.to(plane.rotation, {x: tau * .25, y: 0, z: -tau * 0.05, ease: 'power1.inOut'}, delay)
+            tl.to(plane.position, {x: -40, y: 0, z: -60, ease: 'power1.inOut'}, delay)
+            
+            delay += sectionDuration;
+            tl.to(plane.rotation, {x: tau * .25, y: 0,  z: tau * 0.05, ease: 'power3.inOut'}, delay)
+            tl.to(plane.position, {x: 40, y: 0, z: -60, ease: 'power2.inOut'}, delay)
+            
+            delay += sectionDuration;
+            tl.to(plane.rotation, {x: tau * .2, y: 0, z: -tau * 0.1, ease: 'power3.inOut'}, delay)
+            tl.to(plane.position, {x: -40, y: 0, z: -30, ease: 'power2.inOut'}, delay)
+            
+            delay += sectionDuration;
+            delay += sectionDuration;
+            tl.to(plane.rotation, {x: tau * 0.25, y: tau *.5, z: 0, ease:'power4.inOut'}, delay)
+            tl.to(plane.position, {z: 30, ease:'power4.inOut'}, delay)
+            
+            delay += sectionDuration;
+            tl.to(plane.rotation, {x: tau * 0.25, y: tau *.5, z: 0, ease:'power4.inOut'}, delay)
+            tl.to(plane.position, {z: 60, x: 30, ease:'power4.inOut'}, delay)
+            
+            delay += sectionDuration;
+            tl.to(plane.rotation, {x: tau * 0.35, y: tau *.75, z: tau * 0.6, ease:'power4.inOut'}, delay)
+            tl.to(plane.position, {z: 100, x: 20, y: 0, ease:'power4.inOut'}, delay)
+            
+            delay += sectionDuration;
+            tl.to(plane.rotation, {x: tau * 0.15, y: tau *.85, z: -tau * 0, ease: 'power1.in'}, delay)
+            tl.to(plane.position, {z: -150, x: 0, y: 0, ease: 'power1.inOut'}, delay)
+            
+            delay += sectionDuration;
+            tl.to(plane.rotation, {duration: sectionDuration, x: -tau * 0.05, y: tau, z: -tau * 0.1, ease: 'none'}, delay)
+            tl.to(plane.position, {duration: sectionDuration, x: 0, y: 30, z: 320, ease: 'power1.in'}, delay)
+            
+            tl.to(scene.light.position, {duration: sectionDuration, x: 0, y: 0, z: 0}, delay)
+
+            // Trigger to show the CV section
+            gsap.to("#cv-section", {
+                scrollTrigger: {
+                    trigger: ".blueprint .section:last-of-type", // The last section of the animation
+                    start: "bottom bottom",
+                    scrub: false,
+                    onEnter: () => {
+                        document.querySelector("#cv-section").classList.add("visible");
+                        document.querySelector(".animation-body").style.overflowY = "auto";
+                        gsap.to('#skip-btn', {autoAlpha: 0}); // Hide skip button
+                    },
+                    onLeaveBack: () => {
+                        document.querySelector("#cv-section").classList.remove("visible");
+                        gsap.to('#skip-btn', {autoAlpha: 1}); // Show skip button
+                    }
+                }
+            });
+        }
+
+        loadModel();
+    </script>
+</body>
+</html>
